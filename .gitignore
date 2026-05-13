@@ -1,0 +1,81 @@
+# =========================
+# Python cache files
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+
+# =========================
+# Virtual environments
+# =========================
+venv/
+env/
+.venv/
+
+
+# =========================
+# Jupyter notebook checkpoints
+# =========================
+.ipynb_checkpoints/
+
+
+# =========================
+# Environment variables / secrets
+# =========================
+.env
+.env.*
+kaggle.json
+
+
+# =========================
+# Dataset files - do not upload full dataset to GitHub
+# =========================
+data/
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+
+
+# =========================
+# YOLO training outputs - usually large
+# =========================
+runs/
+wandb/
+
+
+# =========================
+# Model weights - usually large
+# =========================
+*.pt
+*.pth
+*.onnx
+*.engine
+*.tflite
+
+
+# =========================
+# Large media files
+# =========================
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+Thumbs.db
+
+
+# =========================
+# IDE/editor files
+# =========================
+.vscode/
+.idea/
