@@ -38,6 +38,7 @@ total_humans = pedestrian_count + people_count
 
 ---
 
+```txt
 drone-human-car-detection/
 ├── notebooks/
 │   ├── 01_dataset_understanding.ipynb
@@ -65,6 +66,7 @@ drone-human-car-detection/
 ├── README.md
 ├── requirements.txt
 └── .gitignore
+```
 
 ---
 
@@ -431,10 +433,9 @@ runs/detect/yolo_human_car/
 │   └── last.pt
 ├── results.png
 ├── confusion_matrix.png
-├── PR_curve.png
-├── F1_curve.png
-├── P_curve.png
-├── R_curve.png
+├── results.csv
+├── confusion_matrix_normalized.png
+├── labels.jpg
 └── args.yaml
 ```
 
@@ -455,8 +456,11 @@ This folder contains:
 ```txt
 outputs/task02/
 ├── results.png
+├── results.csv
 ├── confusion_matrix.png
+├── sample_inputs/
 └── sample_predictions/
+
 ```
 
 ### Training Results
