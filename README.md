@@ -38,17 +38,23 @@ total_humans = pedestrian_count + people_count
 
 ---
 
+## Project Structure
+
 ```txt
 drone-human-car-detection/
 ├── notebooks/
 │   ├── 01_dataset_understanding.ipynb
-│   └── 02_train_yolo_colab.ipynb
+│   ├── 02_train_yolo_colab.ipynb
+│   ├── 03_detection_counting.ipynb
+│   └── 04_bytetrack_tracking.ipynb
 │
 ├── src/
 │   ├── explore_dataset.py
 │   ├── prepare_training_data.py
 │   ├── train.py
-│   └── predict_samples.py
+│   ├── predict_samples.py
+│   ├── detect_count.py
+│   └── track.py
 │
 ├── outputs/
 │   ├── task01/
@@ -56,12 +62,22 @@ drone-human-car-detection/
 │   │   ├── bbox_area_distribution.png
 │   │   └── sample_annotated_images.jpg
 │   │
-│   └── task02/
-│       ├── results.png
-│       ├── results.csv
-│       ├── confusion_matrix.png
-│       ├── sample_inputs/
-│       └── sample_predictions/
+│   ├── task02/
+│   │   ├── results.png
+│   │   ├── results.csv
+│   │   ├── confusion_matrix.png
+│   │   ├── sample_inputs/
+│   │   └── sample_predictions/
+│   │
+│   ├── task03/
+│   │   ├── processed_images/
+│   │   └── detection_counts.csv
+│   │
+│   └── task04/
+│       ├── tracking_input_frames/
+│       ├── tracked_frames/
+│       ├── tracking_summary.csv
+│       └── tracking_output.mp4
 │
 ├── README.md
 ├── requirements.txt
@@ -87,7 +103,7 @@ kaggle.json
 
 The full dataset should be downloaded from Kaggle and placed inside the `data/` folder.
 
-The YOLO training folder `runs/` is generated automatically during training. Selected result images are copied into `outputs/` for documentation and submission.
+The YOLO training folder `runs/` is generated automatically during training. Selected result images are copied into `outputs/` for documentation and submission. Large videos such as `tracking_output.mp4` can be shared through Google Drive if GitHub file size becomes an issue.
 
 ---
 
@@ -535,3 +551,301 @@ notebooks/02_train_yolo_colab.ipynb
 ```
 
 ---
+
+# Task-03: Human and Car Detection with Human Counting
+
+Task-03 uses the trained YOLO model to detect humans and cars in drone/aerial images.
+
+The system performs three main operations:
+
+1. Detect humans and cars.
+2. Draw bounding boxes around detected objects.
+3. Display the total human count on the output image.
+
+This directly satisfies the assessment requirement for human/car detection, bounding box visualization, and human counting.
+
+---
+
+## Counting Logic
+
+The trained model has two target classes:
+
+| Class ID | Class Name |
+|---|---|
+| 0 | human |
+| 1 | car |
+
+The human counting logic is simple:
+
+```txt
+total_humans = number of detections where class_name == "human"
+```
+
+Cars are also detected and displayed, but the required count is focused on humans.
+
+---
+
+## Task-03 Source File
+
+```txt
+src/detect_count.py
+```
+
+This script performs the complete detection and counting pipeline:
+
+- loads the trained YOLO model,
+- runs inference on input images,
+- detects humans and cars,
+- draws bounding boxes,
+- displays total human count,
+- displays car count for additional context,
+- saves processed images,
+- saves a CSV summary of detection counts.
+
+---
+
+## Task-03 Notebook
+
+```txt
+notebooks/03_detection_counting.ipynb
+```
+
+This notebook is used to run the Task-03 pipeline, display processed images, and inspect the detection count results.
+
+---
+
+## Running Task-03
+
+```bash
+python src/detect_count.py \
+    --source outputs/task02/sample_inputs \
+    --output outputs/task03/processed_images \
+    --imgsz 640 \
+    --conf 0.25
+```
+
+If the model path is not detected automatically, provide it manually:
+
+```bash
+python src/detect_count.py \
+    --model runs/detect/yolo_human_car/weights/best.pt \
+    --source outputs/task02/sample_inputs \
+    --output outputs/task03/processed_images \
+    --imgsz 640 \
+    --conf 0.25
+```
+
+---
+
+## Task-03 Outputs
+
+The processed images are saved in:
+
+```txt
+outputs/task03/processed_images/
+```
+
+Each processed image contains:
+
+- bounding boxes for humans,
+- bounding boxes for cars,
+- total human count displayed on the image,
+- car count displayed for additional context.
+
+A CSV summary is saved at:
+
+```txt
+outputs/task03/detection_counts.csv
+```
+
+The CSV file contains:
+
+```txt
+image_name
+human_count
+car_count
+output_path
+```
+
+---
+
+## Task-03 Output Structure
+
+```txt
+outputs/task03/
+├── processed_images/
+└── detection_counts.csv
+```
+
+---
+
+## Observation
+
+The system successfully detects humans and cars from drone/aerial images and displays the total human count on each processed image.
+
+In dense scenes, some labels may overlap because many small objects appear close together. This is a common challenge in aerial object detection, especially when humans and vehicles appear small or crowded.
+
+---
+
+---
+
+# Task-04: Optional Object Tracking
+
+Task-04 adds object tracking as a bonus feature. I used **ByteTrack** with the trained YOLO model because it integrates well with YOLO-based detection pipelines and can assign persistent IDs to detected objects across frames.
+
+The tracking pipeline detects humans and cars in each frame and then assigns tracking IDs to objects as they move through the image sequence.
+
+---
+
+## Tracking Method
+
+The selected tracking method is:
+
+```txt
+YOLOv8 + ByteTrack
+```
+
+YOLO performs object detection, and ByteTrack performs object association across frames.
+
+The tracker is configured using:
+
+```txt
+bytetrack.yaml
+```
+
+---
+
+## Why ByteTrack?
+
+ByteTrack was selected because:
+
+- it works directly with Ultralytics YOLO tracking mode,
+- it is lightweight and fast,
+- it is suitable for multi-object tracking,
+- it can track objects across consecutive frames using detection results,
+- it is practical for a short internship assessment demo.
+
+---
+
+## Task-04 Source File
+
+```txt
+src/track.py
+```
+
+This script performs the complete tracking pipeline:
+
+- loads the trained YOLO model,
+- reads an input video or ordered image sequence,
+- detects humans and cars,
+- assigns tracking IDs using ByteTrack,
+- draws bounding boxes with class names and track IDs,
+- displays current human/car counts,
+- displays unique tracked human/car IDs,
+- saves tracked frames,
+- saves a tracking video,
+- saves a tracking summary CSV.
+
+---
+
+## Task-04 Notebook
+
+```txt
+notebooks/04_bytetrack_tracking.ipynb
+```
+
+This notebook is used to prepare input frames, run the ByteTrack pipeline, display tracked frames, view the tracking summary CSV, and generate the tracking output video.
+
+---
+
+## Running Task-04
+
+```bash
+python src/track.py \
+    --source outputs/task04/tracking_input_frames \
+    --output-dir outputs/task04 \
+    --imgsz 640 \
+    --conf 0.25 \
+    --tracker bytetrack.yaml \
+    --fps 10 \
+    --max-frames 60
+```
+
+If the model path is not detected automatically, provide it manually:
+
+```bash
+python src/track.py \
+    --model runs/detect/yolo_human_car/weights/best.pt \
+    --source outputs/task04/tracking_input_frames \
+    --output-dir outputs/task04 \
+    --imgsz 640 \
+    --conf 0.25 \
+    --tracker bytetrack.yaml \
+    --fps 10 \
+    --max-frames 60
+```
+
+---
+
+## Task-04 Outputs
+
+Task-04 outputs are saved in:
+
+```txt
+outputs/task04/
+```
+
+This folder contains:
+
+```txt
+outputs/task04/
+├── tracking_input_frames/
+├── tracked_frames/
+├── tracking_summary.csv
+└── tracking_output.mp4
+```
+
+### `tracking_input_frames/`
+
+This folder contains the ordered image frames used as input for tracking.
+
+### `tracked_frames/`
+
+This folder contains the processed frames with:
+
+- bounding boxes,
+- class names,
+- tracking IDs,
+- current human/car counts,
+- unique human/car ID counts.
+
+### `tracking_summary.csv`
+
+This CSV file stores tracking information for each frame, including:
+
+```txt
+frame_index
+frame_name
+human_count
+car_count
+human_track_ids
+car_track_ids
+unique_humans_so_far
+unique_cars_so_far
+```
+
+### `tracking_output.mp4`
+
+This video shows the tracking output across consecutive frames.
+
+If the video file is large, it can be shared through Google Drive instead of being uploaded directly to GitHub.
+
+---
+
+## Task-04 Observation
+
+The tracking output demonstrates that the system can assign persistent IDs to detected objects across frames.
+
+In the selected demo sequence, cars were tracked more consistently than humans because humans were smaller, less frequent, and harder to detect from the aerial viewpoint. This is a common limitation in drone-based small-object tracking.
+
+Even with this limitation, the tracking implementation adds a useful bonus feature by showing temporal object association beyond single-image detection.

@@ -1,0 +1,11 @@
+image_name,human_count,car_count,output_path
+0000026_00500_d_0000025.jpg,7,11,/content/drone-human-car-detection/outputs/task03/processed_images/0000026_00500_d_0000025.jpg
+0000026_04000_d_0000032.jpg,0,13,/content/drone-human-car-detection/outputs/task03/processed_images/0000026_04000_d_0000032.jpg
+0000155_00801_d_0000001.jpg,37,23,/content/drone-human-car-detection/outputs/task03/processed_images/0000155_00801_d_0000001.jpg
+0000193_01876_d_0000113.jpg,39,9,/content/drone-human-car-detection/outputs/task03/processed_images/0000193_01876_d_0000113.jpg
+0000194_00800_d_0000123.jpg,19,11,/content/drone-human-car-detection/outputs/task03/processed_images/0000194_00800_d_0000123.jpg
+0000242_00627_d_0000003.jpg,7,23,/content/drone-human-car-detection/outputs/task03/processed_images/0000242_00627_d_0000003.jpg
+0000276_02601_d_0000520.jpg,1,13,/content/drone-human-car-detection/outputs/task03/processed_images/0000276_02601_d_0000520.jpg
+0000277_01801_d_0000548.jpg,10,33,/content/drone-human-car-detection/outputs/task03/processed_images/0000277_01801_d_0000548.jpg
+0000283_00401_d_0000676.jpg,0,4,/content/drone-human-car-detection/outputs/task03/processed_images/0000283_00401_d_0000676.jpg
+0000330_00801_d_0000804.jpg,14,57,/content/drone-human-car-detection/outputs/task03/processed_images/0000330_00801_d_0000804.jpg
