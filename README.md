@@ -46,7 +46,8 @@ drone-human-car-detection/
 │   ├── 01_dataset_understanding.ipynb
 │   ├── 02_train_yolo_colab.ipynb
 │   ├── 03_detection_counting.ipynb
-│   └── 04_bytetrack_tracking.ipynb
+│   ├── 04_bytetrack_tracking.ipynb
+│   └── 05_evaluation_visualization.ipynb
 │
 ├── src/
 │   ├── explore_dataset.py
@@ -54,7 +55,8 @@ drone-human-car-detection/
 │   ├── train.py
 │   ├── predict_samples.py
 │   ├── detect_count.py
-│   └── track.py
+│   ├── track.py
+│   └── evaluate_visualize.py
 │
 ├── outputs/
 │   ├── task01/
@@ -73,11 +75,21 @@ drone-human-car-detection/
 │   │   ├── processed_images/
 │   │   └── detection_counts.csv
 │   │
-│   └── task04/
-│       ├── tracking_input_frames/
-│       ├── tracked_frames/
-│       ├── tracking_summary.csv
-│       └── tracking_output.mp4
+│   ├── task04/
+│   │   ├── tracking_input_frames/
+│   │   ├── tracked_frames/
+│   │   ├── tracking_summary.csv
+│   │   └── tracking_output.mp4
+│   │
+│   └── task05/
+│       ├── selected_prediction_outputs/
+│       ├── selected_counting_visualizations/
+│       ├── selected_tracking_outputs/
+│       ├── prediction_collage.jpg
+│       ├── counting_collage.jpg
+│       ├── tracking_collage.jpg
+│       ├── metrics_summary.csv
+│       └── evaluation_summary.md
 │
 ├── README.md
 ├── requirements.txt
@@ -687,8 +699,6 @@ In dense scenes, some labels may overlap because many small objects appear close
 
 ---
 
----
-
 # Task-04: Optional Object Tracking
 
 Task-04 adds object tracking as a bonus feature. I used **ByteTrack** with the trained YOLO model because it integrates well with YOLO-based detection pipelines and can assign persistent IDs to detected objects across frames.
@@ -849,3 +859,298 @@ The tracking output demonstrates that the system can assign persistent IDs to de
 In the selected demo sequence, cars were tracked more consistently than humans because humans were smaller, less frequent, and harder to detect from the aerial viewpoint. This is a common limitation in drone-based small-object tracking.
 
 Even with this limitation, the tracking implementation adds a useful bonus feature by showing temporal object association beyond single-image detection.
+
+---
+
+# Task-05: Evaluation and Visualization
+
+Task-05 summarizes the final outputs of the complete computer vision pipeline. This section shows prediction outputs, counting visualizations, processed images/results, evaluation metrics, strengths, limitations, and challenges faced.
+
+The goal of this task is to demonstrate that the trained system is not only able to make predictions, but also that the results can be inspected, summarized, and evaluated clearly.
+
+---
+
+## Task-05 Source File
+
+```txt
+src/evaluate_visualize.py
+```
+
+This script collects outputs from previous tasks and generates a final evaluation folder. It summarizes:
+
+- YOLO prediction outputs from Task-02,
+- human counting visualizations from Task-03,
+- optional tracking outputs from Task-04,
+- training metrics such as precision, recall, and mAP,
+- approximate FPS if the trained model is available locally,
+- strengths, limitations, and challenges faced.
+
+---
+
+## Task-05 Notebook
+
+```txt
+notebooks/05_evaluation_visualization.ipynb
+```
+
+This notebook is used to run the evaluation script, inspect generated metrics, display result collages, and view the final evaluation summary.
+
+---
+
+## Running Task-05
+
+```bash
+python src/evaluate_visualize.py \
+    --results-csv outputs/task02/results.csv \
+    --counts-csv outputs/task03/detection_counts.csv \
+    --tracking-csv outputs/task04/tracking_summary.csv \
+    --prediction-dir outputs/task02/sample_predictions \
+    --counting-dir outputs/task03/processed_images \
+    --tracking-dir outputs/task04/tracked_frames \
+    --output-dir outputs/task05 \
+    --imgsz 640 \
+    --conf 0.25 \
+    --max-images 10
+```
+
+---
+
+## Task-05 Outputs
+
+Task-05 outputs are saved in:
+
+```txt
+outputs/task05/
+```
+
+This folder contains:
+
+```txt
+outputs/task05/
+├── selected_prediction_outputs/
+├── selected_counting_visualizations/
+├── selected_tracking_outputs/
+├── prediction_collage.jpg
+├── counting_collage.jpg
+├── tracking_collage.jpg
+├── metrics_summary.csv
+└── evaluation_summary.md
+```
+
+---
+
+## Prediction Outputs
+
+Prediction outputs from Task-02 are collected from:
+
+```txt
+outputs/task02/sample_predictions/
+```
+
+These images show YOLO-predicted bounding boxes for the two target classes:
+
+```txt
+human
+car
+```
+
+Selected prediction examples are copied into:
+
+```txt
+outputs/task05/selected_prediction_outputs/
+```
+
+A combined prediction visualization is saved as:
+
+```txt
+outputs/task05/prediction_collage.jpg
+```
+
+---
+
+## Counting Visualization
+
+Counting visualizations from Task-03 are collected from:
+
+```txt
+outputs/task03/processed_images/
+```
+
+Each processed image contains:
+
+- human bounding boxes,
+- car bounding boxes,
+- total human count,
+- car count for additional context.
+
+Selected counting visualizations are copied into:
+
+```txt
+outputs/task05/selected_counting_visualizations/
+```
+
+A combined counting visualization is saved as:
+
+```txt
+outputs/task05/counting_collage.jpg
+```
+
+---
+
+## Tracking Visualization
+
+Tracking outputs from Task-04 are collected from:
+
+```txt
+outputs/task04/tracked_frames/
+```
+
+Selected tracking outputs are copied into:
+
+```txt
+outputs/task05/selected_tracking_outputs/
+```
+
+A combined tracking visualization is saved as:
+
+```txt
+outputs/task05/tracking_collage.jpg
+```
+
+The tracking video is available at:
+
+```txt
+outputs/task04/tracking_output.mp4
+```
+
+If the video file is large, it can be submitted through Google Drive instead of being uploaded directly to GitHub.
+
+---
+
+## Metrics Summary
+
+The final metrics summary is saved at:
+
+```txt
+outputs/task05/metrics_summary.csv
+```
+
+The metrics are collected from YOLO training and generated output CSV files.
+
+Included metrics may include:
+
+| Metric | Description |
+|---|---|
+| Precision | How many predicted objects were correct |
+| Recall | How many ground-truth objects were detected |
+| mAP50 | Mean Average Precision at IoU threshold 0.50 |
+| mAP50-95 | Mean Average Precision averaged over IoU thresholds 0.50 to 0.95 |
+| FPS | Approximate inference speed if the trained model is available locally |
+| Total humans detected | Sum of detected humans in processed sample images |
+| Total cars detected | Sum of detected cars in processed sample images |
+| Unique tracked IDs | Number of unique tracked objects from ByteTrack output |
+
+The main YOLO training metrics are read from:
+
+```txt
+outputs/task02/results.csv
+```
+
+The counting metrics are read from:
+
+```txt
+outputs/task03/detection_counts.csv
+```
+
+The tracking metrics are read from:
+
+```txt
+outputs/task04/tracking_summary.csv
+```
+
+---
+
+## Evaluation Summary Report
+
+A Markdown evaluation report is generated at:
+
+```txt
+outputs/task05/evaluation_summary.md
+```
+
+This report includes:
+
+- prediction output summary,
+- counting visualization summary,
+- processed result summary,
+- precision, recall, mAP, and optional FPS,
+- strengths,
+- limitations,
+- challenges faced,
+- final conclusion.
+
+---
+
+## Strengths
+
+- The project covers the full computer vision workflow: dataset understanding, preprocessing, model training, inference, counting, visualization, evaluation, and optional tracking.
+- YOLOv8 provides a lightweight and practical object detection pipeline for drone/aerial images.
+- The original VisDrone labels were filtered into task-specific classes: `human` and `car`.
+- The system displays bounding boxes and total human count directly on processed images.
+- Results are saved in both visual form and CSV format, making the outputs easier to inspect and reproduce.
+- ByteTrack adds a useful bonus tracking feature by assigning persistent IDs across consecutive frames.
+
+---
+
+## Limitations
+
+- Humans are often very small in drone images, making them harder to detect than cars.
+- Dense scenes can cause overlapping bounding boxes and labels.
+- Occlusion, shadows, overexposure, and motion blur can reduce detection performance.
+- The counting method is detection-based, so missed detections directly reduce the final human count.
+- Cars are tracked more consistently than humans because cars are larger and clearer from aerial views.
+- The model was trained as a lightweight internship assessment pipeline, so performance can be improved with more tuning and longer experimentation.
+
+---
+
+## Challenges Faced
+
+- The original dataset contained many classes, so it had to be filtered into only `human` and `car`.
+- Local CPU training was slow, so Google Colab GPU training was used.
+- Drone images contain strong scale variation, lighting variation, shadows, and dense object layouts.
+- Small-object detection was challenging because humans occupy very few pixels in many aerial images.
+- Tracking required ordered frames; random validation images are not ideal for object tracking.
+- Some tracking IDs were more stable for cars than humans due to inconsistent human detections across frames.
+
+---
+
+## Task-05 Conclusion
+
+The final system successfully demonstrates prediction outputs, counting visualization, processed results, evaluation metrics, and analysis of strengths and limitations. The pipeline satisfies the final evaluation and visualization requirement by showing both quantitative and qualitative results for drone-based human and car detection.
+
+---
+
+## Final Status
+
+| Task | Status |
+|---|---|
+| Task-01: Dataset Understanding & Preprocessing | Completed |
+| Task-02: YOLO Model Training | Completed |
+| Task-03: Human & Car Detection with Human Counting | Completed |
+| Task-04: Optional ByteTrack Tracking | Completed |
+| Task-05: Evaluation & Visualization | Completed |
+
+---
+
+## Demo Video
+
+A short 3–5 minute demo video is included in the submitted Google Drive folder. The video demonstrates:
+
+- dataset understanding,
+- YOLO training results,
+- human/car detection,
+- human counting visualization,
+- optional ByteTrack tracking,
+- final evaluation outputs.
+
+

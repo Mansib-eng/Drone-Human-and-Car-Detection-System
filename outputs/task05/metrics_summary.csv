@@ -1,0 +1,2 @@
+precision,recall,mAP50,mAP50_95,total_epochs,best_epoch_by_mAP50,processed_images,total_humans_detected,total_cars_detected,avg_humans_per_image,avg_cars_per_image,max_humans_in_image,max_cars_in_image,tracking_available,tracking_frames,unique_humans,unique_cars,fps
+0.69164,0.53395,0.57356,0.31669,50,50,10,134,197,13.4,19.7,39,57,True,35,8,52,66.58291225947991
